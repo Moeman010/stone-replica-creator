@@ -1,17 +1,17 @@
 
 import { useState } from 'react';
-import { Menu, X, Phone, Mail } from 'lucide-react';
+import { Search, Phone, Mail, MessageCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const navItems = [
-    { name: 'Home', href: '#home' },
-    { name: 'Diensten', href: '#diensten' },
-    { name: 'Producten', href: '#producten' },
-    { name: 'Over Ons', href: '#over-ons' },
-    { name: 'Contact', href: '#contact' }
-  ];
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Searching for:', searchQuery);
+    // Implement search functionality here
+  };
 
   return (
     <header className="bg-memorial-dark text-white shadow-lg">
@@ -36,48 +36,35 @@ const Header = () => {
 
       {/* Main navigation */}
       <nav className="container mx-auto px-4 py-4">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          {/* Logo */}
           <div className="text-2xl font-bold">
             Grafsteenwinkel.nl
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-8">
-            {navItems.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className="hover:text-memorial-accent transition-colors duration-200 font-medium"
-              >
-                {item.name}
-              </a>
-            ))}
+          {/* Search bar */}
+          <div className="flex-1 max-w-md mx-4">
+            <form onSubmit={handleSearch} className="relative">
+              <Input
+                type="text"
+                placeholder="Zoek collectie, contact, diensten..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 bg-white text-black"
+              />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+            </form>
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            className="md:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          {/* Contact button */}
+          <Button 
+            variant="outline" 
+            className="border-white text-white hover:bg-white hover:text-memorial-dark flex items-center gap-2"
           >
-            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+            <MessageCircle className="h-4 w-4" />
+            <span className="hidden sm:inline">Contact</span>
+          </Button>
         </div>
-
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden mt-4 pb-4">
-            {navItems.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className="block py-2 hover:text-memorial-accent transition-colors duration-200"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {item.name}
-              </a>
-            ))}
-          </div>
-        )}
       </nav>
     </header>
   );
