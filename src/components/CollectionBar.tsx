@@ -13,13 +13,19 @@ const CollectionBar = () => {
     'Marmer'
   ];
 
+  const handleCollectionClick = (collection: string) => {
+    console.log(`Selected collection: ${collection}`);
+    // In a real app, this would filter products or navigate to a category page
+  };
+
   return (
-    <section className="bg-garden-stone py-2 border-b border-garden-light">
+    <section id="collectie" className="bg-garden-stone py-2 border-b border-garden-light">
       <div className="container mx-auto px-4">
         <div className="flex flex-wrap justify-center gap-2">
           {collections.map((collection, index) => (
             <Button
               key={index}
+              onClick={() => handleCollectionClick(collection)}
               variant="ghost"
               size="sm"
               className="text-black hover:bg-garden-primary hover:text-white transition-colors text-sm py-1 px-3"

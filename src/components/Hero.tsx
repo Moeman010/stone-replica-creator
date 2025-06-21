@@ -2,6 +2,14 @@
 import { Button } from '@/components/ui/button';
 
 const Hero = () => {
+  const handleViewCollection = () => {
+    document.getElementById('collectie')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleCustomDesign = () => {
+    document.getElementById('ontwerp')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <section 
       id="home" 
@@ -13,19 +21,21 @@ const Hero = () => {
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto text-center animate-fade-in">
           <h1 className="text-3xl md:text-5xl font-bold mb-4 text-garden-cream">
-            Professionele Grafstenen
+            Graf & Monument Specialist
           </h1>
           <p className="text-lg md:text-xl mb-6 text-garden-cream">
-            Respectvolle herinneringen in steen
+            Respectvolle herinneringen in natuursteen
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button 
+              onClick={handleViewCollection}
               size="lg" 
-              className="bg-garden-primary hover:bg-garden-secondary text-black px-6 py-2"
+              className="bg-garden-primary hover:bg-garden-secondary text-white px-6 py-2"
             >
               Bekijk Collectie
             </Button>
             <Button 
+              onClick={handleCustomDesign}
               variant="outline" 
               size="lg" 
               className="border-garden-cream text-garden-cream hover:bg-garden-cream hover:text-garden-primary px-6 py-2"

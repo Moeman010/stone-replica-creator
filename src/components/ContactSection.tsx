@@ -1,4 +1,5 @@
 
+import { useState } from 'react';
 import { Phone, Mail, MessageCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,8 +7,52 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
 const ContactSection = () => {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    message: ''
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Form submitted:', formData);
+    alert('Bedankt voor uw bericht! We nemen binnen 24 uur contact met u op.');
+    setFormData({
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      message: ''
+    });
+  };
+
+  const handlePhoneClick = () => {
+    window.location.href = 'tel:+31201234567';
+  };
+
+  const handleEmailClick = () => {
+    window.location.href = 'mailto:info@grafmonumentspecialist.nl';
+  };
+
+  const handleWhatsAppClick = () => {
+    const phoneNumber = '+31201234567';
+    const message = 'Hallo, ik heb interesse in jullie diensten voor grafstenen en monumenten.';
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   return (
-    <section className="py-16 bg-garden-cream">
+    <section id="contact" className="py-16 bg-garden-cream">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-garden-primary mb-4">
@@ -25,7 +70,10 @@ const ContactSection = () => {
               <CardTitle className="text-garden-primary">Direct Contact</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex items-center space-x-4 p-4 bg-garden-stone rounded-lg">
+              <div 
+                onClick={handlePhoneClick}
+                className="flex items-center space-x-4 p-4 bg-garden-stone rounded-lg cursor-pointer hover:bg-garden-light transition-colors"
+              >
                 <div className="bg-garden-primary p-3 rounded-full">
                   <Phone className="h-5 w-5 text-white" />
                 </div>
@@ -35,17 +83,23 @@ const ContactSection = () => {
                 </div>
               </div>
               
-              <div className="flex items-center space-x-4 p-4 bg-garden-stone rounded-lg">
+              <div 
+                onClick={handleEmailClick}
+                className="flex items-center space-x-4 p-4 bg-garden-stone rounded-lg cursor-pointer hover:bg-garden-light transition-colors"
+              >
                 <div className="bg-garden-primary p-3 rounded-full">
                   <Mail className="h-5 w-5 text-white" />
                 </div>
                 <div>
                   <p className="font-medium text-garden-primary">E-mail ons</p>
-                  <p className="text-garden-secondary">info@grafsteenwinkel.nl</p>
+                  <p className="text-garden-secondary">info@grafmonumentspecialist.nl</p>
                 </div>
               </div>
 
-              <div className="flex items-center space-x-4 p-4 bg-garden-stone rounded-lg">
+              <div 
+                onClick={handleWhatsAppClick}
+                className="flex items-center space-x-4 p-4 bg-garden-stone rounded-lg cursor-pointer hover:bg-garden-light transition-colors"
+              >
                 <div className="bg-green-500 p-3 rounded-full">
                   <MessageCircle className="h-5 w-5 text-white" />
                 </div>
@@ -74,19 +128,51 @@ const ContactSection = () => {
               <CardTitle className="text-garden-primary">Stuur een Bericht</CardTitle>
             </CardHeader>
             <CardContent>
-              <form className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Input placeholder="Voornaam" className="border-garden-light focus:border-garden-primary text-black" />
-                  <Input placeholder="Achternaam" className="border-garden-light focus:border-garden-primary text-black" />
+                  <Input 
+                    name="firstName"
+                    placeholder="Voornaam" 
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    className="border-garden-light focus:border-garden-primary text-black" 
+                    required
+                  />
+                  <Input 
+                    name="lastName"
+                    placeholder="Achternaam" 
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    className="border-garden-light focus:border-garden-primary text-black" 
+                    required
+                  />
                 </div>
-                <Input placeholder="E-mailadres" type="email" className="border-garden-light focus:border-garden-primary text-black" />
-                <Input placeholder="Telefoonnummer" className="border-garden-light focus:border-garden-primary text-black" />
+                <Input 
+                  name="email"
+                  placeholder="E-mailadres" 
+                  type="email" 
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="border-garden-light focus:border-garden-primary text-black" 
+                  required
+                />
+                <Input 
+                  name="phone"
+                  placeholder="Telefoonnummer" 
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  className="border-garden-light focus:border-garden-primary text-black" 
+                />
                 <Textarea 
+                  name="message"
                   placeholder="Uw bericht..."
                   rows={4}
+                  value={formData.message}
+                  onChange={handleInputChange}
                   className="border-garden-light focus:border-garden-primary text-black"
+                  required
                 />
-                <Button className="w-full bg-garden-primary hover:bg-garden-secondary text-black">
+                <Button type="submit" className="w-full bg-garden-primary hover:bg-garden-secondary text-white">
                   Verstuur Bericht
                 </Button>
               </form>

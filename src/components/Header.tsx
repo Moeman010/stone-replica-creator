@@ -9,7 +9,20 @@ const Header = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    if (searchQuery.toLowerCase().includes('collectie')) {
+      document.getElementById('collectie')?.scrollIntoView({ behavior: 'smooth' });
+    } else if (searchQuery.toLowerCase().includes('contact')) {
+      document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+    } else if (searchQuery.toLowerCase().includes('diensten')) {
+      document.getElementById('diensten')?.scrollIntoView({ behavior: 'smooth' });
+    } else if (searchQuery.toLowerCase().includes('ontwerp')) {
+      document.getElementById('ontwerp')?.scrollIntoView({ behavior: 'smooth' });
+    }
     console.log('Searching for:', searchQuery);
+  };
+
+  const handleContactClick = () => {
+    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -24,7 +37,7 @@ const Header = () => {
             </div>
             <div className="flex items-center space-x-1">
               <Mail className="h-3 w-3" />
-              <span>info@grafsteenwinkel.nl</span>
+              <span>info@grafmonumentspecialist.nl</span>
             </div>
           </div>
           <div className="hidden md:block">
@@ -37,8 +50,13 @@ const Header = () => {
       <nav className="container mx-auto px-4 py-2">
         <div className="flex flex-col md:flex-row justify-between items-center gap-3">
           {/* Logo */}
-          <div className="text-xl font-bold text-black">
-            Grafsteenwinkel.nl
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-garden-cream rounded-full flex items-center justify-center">
+              <span className="text-garden-primary font-bold text-lg">G&M</span>
+            </div>
+            <div className="text-lg font-bold text-black">
+              Graf & Monument Specialist
+            </div>
           </div>
 
           {/* Search bar */}
@@ -57,6 +75,7 @@ const Header = () => {
 
           {/* Contact button */}
           <Button 
+            onClick={handleContactClick}
             variant="outline" 
             className="border-white text-black bg-garden-cream hover:bg-garden-stone hover:text-black flex items-center gap-2"
           >
