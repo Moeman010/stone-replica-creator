@@ -14,14 +14,15 @@ const CollectionBar = () => {
   ];
 
   return (
-    <section className="bg-gray-100 py-4 border-b">
+    <section className="bg-garden-stone py-2 border-b border-garden-light">
       <div className="container mx-auto px-4">
-        <div className="flex flex-wrap justify-center gap-3">
+        <div className="flex flex-wrap justify-center gap-2">
           {collections.map((collection, index) => (
             <Button
               key={index}
               variant="ghost"
-              className="text-memorial-dark hover:bg-memorial-accent hover:text-white transition-colors"
+              size="sm"
+              className="text-black hover:bg-garden-primary hover:text-white transition-colors text-sm py-1 px-3"
             >
               {collection}
             </Button>

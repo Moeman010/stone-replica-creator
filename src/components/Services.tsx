@@ -27,28 +27,28 @@ const Services = () => {
   ];
 
   return (
-    <section id="diensten" className="py-20 bg-gray-50">
+    <section id="diensten" className="py-16 bg-white">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-memorial-dark mb-4">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-garden-primary mb-4">
             Onze Diensten
           </h2>
-          <p className="text-xl text-memorial-light max-w-2xl mx-auto">
+          <p className="text-lg text-garden-secondary max-w-2xl mx-auto">
             Van ontwerp tot plaatsing, wij begeleiden u door het gehele proces
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {services.map((service, index) => (
-            <Card key={index} className="text-center hover:shadow-lg transition-shadow duration-300">
+            <Card key={index} className="text-center hover:shadow-lg transition-all duration-300 bg-garden-stone/30 border-garden-light hover:border-garden-primary">
               <CardHeader>
-                <div className="mx-auto w-16 h-16 bg-memorial-accent/10 rounded-full flex items-center justify-center mb-4">
-                  <service.icon className="h-8 w-8 text-memorial-accent" />
+                <div className="mx-auto w-16 h-16 bg-garden-primary/20 rounded-full flex items-center justify-center mb-4">
+                  <service.icon className="h-8 w-8 text-garden-primary" />
                 </div>
-                <CardTitle className="text-memorial-dark">{service.title}</CardTitle>
+                <CardTitle className="text-garden-primary">{service.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-memorial-light">
+                <CardDescription className="text-garden-secondary">
                   {service.description}
                 </CardDescription>
               </CardContent>

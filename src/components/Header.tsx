@@ -10,21 +10,20 @@ const Header = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Searching for:', searchQuery);
-    // Implement search functionality here
   };
 
   return (
-    <header className="bg-memorial-dark text-white shadow-lg">
-      {/* Top bar with contact info */}
-      <div className="bg-memorial-medium py-2">
-        <div className="container mx-auto px-4 flex justify-between items-center text-sm">
-          <div className="flex items-center space-x-6">
-            <div className="flex items-center space-x-2">
-              <Phone className="h-4 w-4" />
+    <header className="bg-garden-primary text-white shadow-lg">
+      {/* Top bar with contact info - smaller */}
+      <div className="bg-garden-secondary py-1">
+        <div className="container mx-auto px-4 flex justify-between items-center text-xs">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-1">
+              <Phone className="h-3 w-3" />
               <span>+31 (0)20 123 4567</span>
             </div>
-            <div className="flex items-center space-x-2">
-              <Mail className="h-4 w-4" />
+            <div className="flex items-center space-x-1">
+              <Mail className="h-3 w-3" />
               <span>info@grafsteenwinkel.nl</span>
             </div>
           </div>
@@ -34,11 +33,11 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Main navigation */}
-      <nav className="container mx-auto px-4 py-4">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+      {/* Main navigation - smaller */}
+      <nav className="container mx-auto px-4 py-2">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-3">
           {/* Logo */}
-          <div className="text-2xl font-bold">
+          <div className="text-xl font-bold text-black">
             Grafsteenwinkel.nl
           </div>
 
@@ -50,16 +49,16 @@ const Header = () => {
                 placeholder="Zoek collectie, contact, diensten..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-white text-black"
+                className="w-full pl-10 pr-4 py-2 bg-garden-cream text-black border-garden-stone"
               />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-garden-secondary" />
             </form>
           </div>
 
           {/* Contact button */}
           <Button 
             variant="outline" 
-            className="border-white text-white hover:bg-white hover:text-memorial-dark flex items-center gap-2"
+            className="border-white text-black bg-garden-cream hover:bg-garden-stone hover:text-black flex items-center gap-2"
           >
             <MessageCircle className="h-4 w-4" />
             <span className="hidden sm:inline">Contact</span>

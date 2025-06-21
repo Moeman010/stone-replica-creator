@@ -63,11 +63,12 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				memorial: {
-					dark: '#1f2937',
-					medium: '#374151',
-					light: '#6b7280',
-					accent: '#d97706'
+				garden: {
+					primary: '#4C5C4C',
+					secondary: '#6B7B6B', 
+					light: '#8A9A8A',
+					cream: '#F8F6F3',
+					stone: '#E5E2DD'
 				}
 			},
 			borderRadius: {
@@ -101,12 +102,21 @@ export default {
 						opacity: '1',
 						transform: 'translateY(0)'
 					}
+				},
+				'float': {
+					'0%, 100%': {
+						transform: 'translateY(0px)'
+					},
+					'50%': {
+						transform: 'translateY(-6px)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-				'fade-in': 'fade-in 0.6s ease-out'
+				'fade-in': 'fade-in 0.6s ease-out',
+				'float': 'float 3s ease-in-out infinite'
 			}
 		}
 	},
