@@ -1,28 +1,28 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, Phone, Mail, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.toLowerCase().includes('collectie')) {
-      document.getElementById('collectie')?.scrollIntoView({ behavior: 'smooth' });
-    } else if (searchQuery.toLowerCase().includes('contact')) {
-      document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
-    } else if (searchQuery.toLowerCase().includes('diensten')) {
-      document.getElementById('diensten')?.scrollIntoView({ behavior: 'smooth' });
-    } else if (searchQuery.toLowerCase().includes('ontwerp')) {
-      document.getElementById('ontwerp')?.scrollIntoView({ behavior: 'smooth' });
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
     }
-    console.log('Searching for:', searchQuery);
   };
 
   const handleContactClick = () => {
-    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+    navigate('/contact');
+  };
+
+  const handleLogoClick = () => {
+    navigate('/');
   };
 
   return (
@@ -50,7 +50,10 @@ const Header = () => {
       <nav className="container mx-auto px-4 py-2">
         <div className="flex flex-col md:flex-row justify-between items-center gap-3">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
+          <div 
+            className="flex items-center space-x-3 cursor-pointer"
+            onClick={handleLogoClick}
+          >
             <div className="w-10 h-10 bg-garden-cream rounded-full flex items-center justify-center">
               <span className="text-garden-primary font-bold text-lg">G&M</span>
             </div>
@@ -64,7 +67,7 @@ const Header = () => {
             <form onSubmit={handleSearch} className="relative">
               <Input
                 type="text"
-                placeholder="Zoek collectie, contact, diensten..."
+                placeholder="Zoek collectie, contact, producten..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 bg-garden-cream text-black border-garden-stone"
