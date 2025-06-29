@@ -13,14 +13,15 @@ const CartIcon = () => {
       variant="outline"
       size="sm"
       onClick={() => navigate('/cart')}
-      className="relative"
+      className="relative hover:bg-garden-primary hover:text-white transition-colors"
     >
       <ShoppingCart className="h-4 w-4" />
       {totalItems > 0 && (
-        <span className="absolute -top-2 -right-2 bg-garden-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-          {totalItems}
+        <span className="absolute -top-2 -right-2 bg-garden-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold animate-pulse">
+          {totalItems > 99 ? '99+' : totalItems}
         </span>
       )}
+      <span className="sr-only">Winkelwagen ({totalItems} items)</span>
     </Button>
   );
 };

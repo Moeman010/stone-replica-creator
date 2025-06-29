@@ -38,6 +38,8 @@ const CheckoutPage = () => {
     setLoading(true);
 
     try {
+      console.log('Starting checkout process...');
+      
       // Create order in database
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -56,13 +58,20 @@ const CheckoutPage = () => {
         }
       };
 
+      console.log('Creating order with data:', orderData);
+
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert(orderData)
         .select()
         .single();
 
-      if (orderError) throw orderError;
+      if (orderError) {
+        console.error('Order creation error:', orderError);
+        throw orderError;
+      }
+
+      console.log('Order created successfully:', order);
 
       // Add order items
       const orderItems = items.map(item => ({
@@ -72,14 +81,60 @@ const CheckoutPage = () => {
         price: item.product.price
       }));
 
+      console.log('Creating order items:', orderItems);
+
       const { error: itemsError } = await supabase
         .from('order_items')
         .insert(orderItems);
 
-      if (itemsError) throw itemsError;
+      if (itemsError) {
+        console.error('Order items creation error:', itemsError);
+        throw itemsError;
+      }
+
+      console.log('Order items created successfully');
+
+      // Send order confirmation email
+      try {
+        console.log('Sending order confirmation email...');
+        const emailData = {
+          email: formData.email,
+          orderId: order.id.substring(0, 8).toUpperCase(),
+          customerName: `${formData.firstName} ${formData.lastName}`,
+          items: items.map(item => ({
+            name: item.product.name,
+            quantity: item.quantity,
+            price: item.product.price
+          })),
+          totalAmount: totalPrice,
+          shippingAddress: {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            address: formData.address,
+            city: formData.city,
+            postalCode: formData.postalCode,
+            phone: formData.phone
+          }
+        };
+
+        const { error: emailError } = await supabase.functions.invoke('send-order-confirmation', {
+          body: emailData
+        });
+
+        if (emailError) {
+          console.error('Email sending error:', emailError);
+          // Don't throw here, continue with checkout even if email fails
+        } else {
+          console.log('Order confirmation email sent successfully');
+        }
+      } catch (emailError) {
+        console.error('Email sending failed:', emailError);
+        // Continue with checkout process even if email fails
+      }
 
       // Create Stripe checkout session
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
+      console.log('Creating Stripe checkout session...');
+      const { data: stripeData, error: stripeError } = await supabase.functions.invoke('create-checkout', {
         body: {
           orderId: order.id,
           items: items.map(item => ({
@@ -91,24 +146,42 @@ const CheckoutPage = () => {
         }
       });
 
-      if (error) throw error;
+      if (stripeError) {
+        console.error('Stripe checkout error:', stripeError);
+        throw stripeError;
+      }
+
+      console.log('Stripe checkout session created:', stripeData);
+
+      if (!stripeData?.url) {
+        throw new Error('Geen betaal URL ontvangen van Stripe');
+      }
 
       // Update order with Stripe session ID
-      await supabase
-        .from('orders')
-        .update({ stripe_session_id: data.sessionId })
-        .eq('id', order.id);
+      if (stripeData.sessionId) {
+        await supabase
+          .from('orders')
+          .update({ stripe_session_id: stripeData.sessionId })
+          .eq('id', order.id);
+      }
 
-      // Clear cart and redirect to Stripe
+      // Clear cart
       await clearCart();
-      window.open(data.url, '_blank');
-      navigate('/order-success');
+
+      toast({
+        title: 'Bestelling geplaatst!',
+        description: 'U wordt doorgestuurd naar de betaalpagina...'
+      });
+
+      // Redirect to Stripe in the same window instead of new tab
+      console.log('Redirecting to Stripe:', stripeData.url);
+      window.location.href = stripeData.url;
 
     } catch (error) {
       console.error('Checkout error:', error);
       toast({
         title: 'Fout bij afrekenen',
-        description: 'Er is een fout opgetreden. Probeer het opnieuw.',
+        description: error instanceof Error ? error.message : 'Er is een fout opgetreden. Probeer het opnieuw.',
         variant: 'destructive'
       });
     } finally {
@@ -138,7 +211,7 @@ const CheckoutPage = () => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="firstName">Voornaam</Label>
+                    <Label htmlFor="firstName">Voornaam *</Label>
                     <Input
                       id="firstName"
                       name="firstName"
@@ -148,7 +221,7 @@ const CheckoutPage = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="lastName">Achternaam</Label>
+                    <Label htmlFor="lastName">Achternaam *</Label>
                     <Input
                       id="lastName"
                       name="lastName"
@@ -160,7 +233,7 @@ const CheckoutPage = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="email">E-mailadres</Label>
+                  <Label htmlFor="email">E-mailadres *</Label>
                   <Input
                     id="email"
                     name="email"
@@ -169,10 +242,13 @@ const CheckoutPage = () => {
                     onChange={handleInputChange}
                     required
                   />
+                  <p className="text-sm text-gray-500 mt-1">
+                    U ontvangt een bevestigingsmail op dit e-mailadres
+                  </p>
                 </div>
 
                 <div>
-                  <Label htmlFor="phone">Telefoonnummer</Label>
+                  <Label htmlFor="phone">Telefoonnummer *</Label>
                   <Input
                     id="phone"
                     name="phone"
@@ -184,7 +260,7 @@ const CheckoutPage = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="address">Adres</Label>
+                  <Label htmlFor="address">Adres *</Label>
                   <Input
                     id="address"
                     name="address"
@@ -196,7 +272,7 @@ const CheckoutPage = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="postalCode">Postcode</Label>
+                    <Label htmlFor="postalCode">Postcode *</Label>
                     <Input
                       id="postalCode"
                       name="postalCode"
@@ -206,7 +282,7 @@ const CheckoutPage = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="city">Plaats</Label>
+                    <Label htmlFor="city">Plaats *</Label>
                     <Input
                       id="city"
                       name="city"
@@ -217,12 +293,19 @@ const CheckoutPage = () => {
                   </div>
                 </div>
 
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <p className="text-sm text-blue-700">
+                    <strong>Let op:</strong> Na het plaatsen van uw bestelling wordt u doorgestuurd naar een veilige betaalpagina van Stripe. 
+                    U ontvangt ook een bevestigingsmail met alle details van uw bestelling.
+                  </p>
+                </div>
+
                 <Button
                   type="submit"
                   className="w-full bg-garden-primary hover:bg-garden-secondary"
                   disabled={loading}
                 >
-                  {loading ? 'Bezig met afrekenen...' : `Betalen €${totalPrice.toFixed(2)}`}
+                  {loading ? 'Bestellling wordt verwerkt...' : `Bestelling plaatsen en betalen €${totalPrice.toFixed(2)}`}
                 </Button>
               </form>
             </CardContent>

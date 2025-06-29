@@ -25,6 +25,7 @@ interface CartContextType {
   totalItems: number;
   totalPrice: number;
   loading: boolean;
+  refreshCart: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -73,7 +74,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const { data, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching cart items:', error);
+        throw error;
+      }
+
+      console.log('Fetched cart items:', data);
       setItems(data || []);
     } catch (error) {
       console.error('Error fetching cart items:', error);
@@ -89,7 +95,18 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const addToCart = async (productId: string, quantity = 1) => {
     try {
+      console.log('Adding to cart:', { productId, quantity });
+      
       const { data: { user } } = await supabase.auth.getUser();
+      
+      // Check if item already exists in cart
+      const existingItem = items.find(item => item.product_id === productId);
+      
+      if (existingItem) {
+        console.log('Item already in cart, updating quantity');
+        await updateQuantity(existingItem.id, existingItem.quantity + quantity);
+        return;
+      }
       
       const cartData = {
         product_id: productId,
@@ -97,11 +114,16 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ...(user ? { user_id: user.id } : { session_id: getSessionId() })
       };
 
+      console.log('Inserting cart data:', cartData);
+
       const { error } = await supabase
         .from('cart_items')
         .insert(cartData);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error adding to cart:', error);
+        throw error;
+      }
 
       await fetchCartItems();
       toast({
@@ -120,12 +142,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const removeFromCart = async (itemId: string) => {
     try {
+      console.log('Removing from cart:', itemId);
+      
       const { error } = await supabase
         .from('cart_items')
         .delete()
         .eq('id', itemId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error removing from cart:', error);
+        throw error;
+      }
 
       await fetchCartItems();
       toast({
@@ -144,12 +171,22 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateQuantity = async (itemId: string, quantity: number) => {
     try {
+      console.log('Updating quantity:', { itemId, quantity });
+      
+      if (quantity <= 0) {
+        await removeFromCart(itemId);
+        return;
+      }
+
       const { error } = await supabase
         .from('cart_items')
         .update({ quantity })
         .eq('id', itemId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating quantity:', error);
+        throw error;
+      }
 
       await fetchCartItems();
     } catch (error) {
@@ -164,6 +201,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const clearCart = async () => {
     try {
+      console.log('Clearing cart...');
+      
       const { data: { user } } = await supabase.auth.getUser();
       
       let query = supabase.from('cart_items').delete();
@@ -175,12 +214,20 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       const { error } = await query;
-      if (error) throw error;
+      if (error) {
+        console.error('Error clearing cart:', error);
+        throw error;
+      }
 
+      console.log('Cart cleared successfully');
       setItems([]);
     } catch (error) {
       console.error('Error clearing cart:', error);
     }
+  };
+
+  const refreshCart = async () => {
+    await fetchCartItems();
   };
 
   useEffect(() => {
@@ -199,7 +246,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       clearCart,
       totalItems,
       totalPrice,
-      loading
+      loading,
+      refreshCart
     }}>
       {children}
     </CartContext.Provider>
