@@ -92,6 +92,37 @@ const CheckoutPage = () => {
 
       console.log('Order items created successfully');
 
+      console.log('Creating Stripe checkout session...');
+      const { data: stripeData, error: stripeError } = await supabase.functions.invoke('create-checkout', {
+        body: {
+          orderId: order.id,
+          items: items.map(item => ({
+            name: item.product.name,
+            price: item.product.price,
+            quantity: item.quantity
+          })),
+          customerEmail: formData.email
+        }
+      });
+
+      if (stripeError) {
+        console.error('Stripe checkout error:', stripeError);
+        throw stripeError;
+      }
+
+      console.log('Stripe checkout session created:', stripeData);
+
+      if (!stripeData?.url) {
+        throw new Error('Geen betaal URL ontvangen van Stripe');
+      }
+
+      if (stripeData.sessionId) {
+        await supabase
+          .from('orders')
+          .update({ stripe_session_id: stripeData.sessionId })
+          .eq('id', order.id);
+      }
+
       try {
         console.log('Sending order confirmation email...');
         const emailData = {
@@ -127,37 +158,6 @@ const CheckoutPage = () => {
         console.error('Email sending failed:', emailError);
       }
 
-      console.log('Creating Stripe checkout session...');
-      const { data: stripeData, error: stripeError } = await supabase.functions.invoke('create-checkout', {
-        body: {
-          orderId: order.id,
-          items: items.map(item => ({
-            name: item.product.name,
-            price: item.product.price,
-            quantity: item.quantity
-          })),
-          customerEmail: formData.email
-        }
-      });
-
-      if (stripeError) {
-        console.error('Stripe checkout error:', stripeError);
-        throw stripeError;
-      }
-
-      console.log('Stripe checkout session created:', stripeData);
-
-      if (!stripeData?.url) {
-        throw new Error('Geen betaal URL ontvangen van Stripe');
-      }
-
-      if (stripeData.sessionId) {
-        await supabase
-          .from('orders')
-          .update({ stripe_session_id: stripeData.sessionId })
-          .eq('id', order.id);
-      }
-
       await clearCart();
 
       toast({
@@ -165,7 +165,7 @@ const CheckoutPage = () => {
         description: 'U wordt doorgestuurd naar de betaalpagina...'
       });
 
-      console.log('Redirecting to Stripe:', stripeData.url);
+      console.log('Redirecting to Stripe checkout:', stripeData.url);
       window.location.href = stripeData.url;
 
     } catch (error) {
@@ -286,8 +286,8 @@ const CheckoutPage = () => {
 
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <p className="text-sm text-blue-700">
-                    <strong>Let op:</strong> Na het plaatsen van uw bestelling wordt u doorgestuurd naar een veilige betaalpagina van Stripe. 
-                    U ontvangt ook een bevestigingsmail met alle details van uw bestelling.
+                    <strong>Let op:</strong> Na het plaatsen van uw bestelling wordt u doorgestuurd naar een veilige betaalpagina van Stripe waar u uw betaling kunt voltooien. 
+                    Na succesvolle betaling wordt u teruggeleid naar onze bevestigingspagina.
                   </p>
                 </div>
 
@@ -296,7 +296,7 @@ const CheckoutPage = () => {
                   className="w-full bg-garden-primary hover:bg-garden-secondary"
                   disabled={loading}
                 >
-                  {loading ? 'Bestellling wordt verwerkt...' : `Bestelling plaatsen en betalen €${totalPrice.toFixed(2)}`}
+                  {loading ? 'Bestelling wordt verwerkt...' : `Bestelling plaatsen - €${totalPrice.toFixed(2)}`}
                 </Button>
               </form>
             </CardContent>
