@@ -20,9 +20,6 @@ const CheckoutPage = () => {
     email: '',
     firstName: '',
     lastName: '',
-    address: '',
-    city: '',
-    postalCode: '',
     phone: ''
   });
 
@@ -46,15 +43,7 @@ const CheckoutPage = () => {
         email: formData.email,
         total_amount: totalPrice,
         status: 'pending',
-        user_id: user?.id || null,
-        shipping_address: {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          address: formData.address,
-          city: formData.city,
-          postalCode: formData.postalCode,
-          phone: formData.phone
-        }
+        user_id: user?.id || null
       };
 
       console.log('Creating order with data:', orderData);
@@ -135,14 +124,7 @@ const CheckoutPage = () => {
             price: item.product.price
           })),
           totalAmount: totalPrice,
-          shippingAddress: {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            address: formData.address,
-            city: formData.city,
-            postalCode: formData.postalCode,
-            phone: formData.phone
-          }
+          customerPhone: formData.phone
         };
 
         const { error: emailError } = await supabase.functions.invoke('send-order-confirmation', {
@@ -250,43 +232,9 @@ const CheckoutPage = () => {
                   />
                 </div>
 
-                <div>
-                  <Label htmlFor="address">Adres *</Label>
-                  <Input
-                    id="address"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="postalCode">Postcode *</Label>
-                    <Input
-                      id="postalCode"
-                      name="postalCode"
-                      value={formData.postalCode}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="city">Plaats *</Label>
-                    <Input
-                      id="city"
-                      name="city"
-                      value={formData.city}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                </div>
-
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <p className="text-sm text-blue-700">
-                    <strong>Let op:</strong> Na het plaatsen van uw bestelling wordt u doorgestuurd naar een veilige betaalpagina van Stripe waar u uw betaling kunt voltooien. 
+                    <strong>Let op:</strong> Na het plaatsen van uw bestelling wordt u doorgestuurd naar een veilige betaalpagina van Stripe waar u uw betaling en bezorgadres kunt invullen. 
                     Na succesvolle betaling wordt u teruggeleid naar onze bevestigingspagina.
                   </p>
                 </div>
