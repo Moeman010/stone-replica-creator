@@ -13,7 +13,6 @@ const OrderSuccessPage = () => {
   const [countdown, setCountdown] = useState(10);
   const sessionId = searchParams.get('session_id');
 
-  // Countdown timer for automatic redirect
   useEffect(() => {
     const timer = setInterval(() => {
       setCountdown((prev) => {

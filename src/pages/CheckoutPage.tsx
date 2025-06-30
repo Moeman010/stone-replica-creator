@@ -40,7 +40,6 @@ const CheckoutPage = () => {
     try {
       console.log('Starting checkout process...');
       
-      // Create order in database
       const { data: { user } } = await supabase.auth.getUser();
       
       const orderData = {
@@ -73,7 +72,6 @@ const CheckoutPage = () => {
 
       console.log('Order created successfully:', order);
 
-      // Add order items
       const orderItems = items.map(item => ({
         order_id: order.id,
         product_id: item.product_id,
@@ -94,7 +92,6 @@ const CheckoutPage = () => {
 
       console.log('Order items created successfully');
 
-      // Send order confirmation email
       try {
         console.log('Sending order confirmation email...');
         const emailData = {
@@ -123,16 +120,13 @@ const CheckoutPage = () => {
 
         if (emailError) {
           console.error('Email sending error:', emailError);
-          // Don't throw here, continue with checkout even if email fails
         } else {
           console.log('Order confirmation email sent successfully');
         }
       } catch (emailError) {
         console.error('Email sending failed:', emailError);
-        // Continue with checkout process even if email fails
       }
 
-      // Create Stripe checkout session
       console.log('Creating Stripe checkout session...');
       const { data: stripeData, error: stripeError } = await supabase.functions.invoke('create-checkout', {
         body: {
@@ -157,7 +151,6 @@ const CheckoutPage = () => {
         throw new Error('Geen betaal URL ontvangen van Stripe');
       }
 
-      // Update order with Stripe session ID
       if (stripeData.sessionId) {
         await supabase
           .from('orders')
@@ -165,7 +158,6 @@ const CheckoutPage = () => {
           .eq('id', order.id);
       }
 
-      // Clear cart
       await clearCart();
 
       toast({
@@ -173,7 +165,6 @@ const CheckoutPage = () => {
         description: 'U wordt doorgestuurd naar de betaalpagina...'
       });
 
-      // Redirect to Stripe in the same window instead of new tab
       console.log('Redirecting to Stripe:', stripeData.url);
       window.location.href = stripeData.url;
 

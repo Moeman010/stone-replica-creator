@@ -99,7 +99,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       const { data: { user } } = await supabase.auth.getUser();
       
-      // Check if item already exists in cart
       const existingItem = items.find(item => item.product_id === productId);
       
       if (existingItem) {

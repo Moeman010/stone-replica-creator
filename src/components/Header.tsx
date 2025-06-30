@@ -19,7 +19,6 @@ const Header = () => {
     }
   };
 
-  // Close mobile menu when route changes
   useEffect(() => {
     setIsMenuOpen(false);
   }, [navigate]);
@@ -39,7 +38,6 @@ const Header = () => {
     <header className="bg-white shadow-sm border-b border-garden-light sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
           <div className="flex-shrink-0">
             <h1 
               className="text-2xl font-bold text-garden-primary cursor-pointer hover:text-garden-secondary transition-colors"
@@ -49,7 +47,6 @@ const Header = () => {
             </h1>
           </div>
 
-          {/* Search Bar - Desktop */}
           <div className="hidden md:flex flex-1 max-w-md mx-8">
             <form onSubmit={handleSearch} className="flex w-full">
               <Input
@@ -69,7 +66,6 @@ const Header = () => {
             </form>
           </div>
 
-          {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-6">
             {navigationItems.slice(0, 4).map((item) => (
               <a 
@@ -83,7 +79,6 @@ const Header = () => {
             <CartIcon />
           </nav>
 
-          {/* Mobile menu button */}
           <div className="lg:hidden flex items-center gap-2">
             <CartIcon />
             <Button
@@ -97,11 +92,9 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="lg:hidden border-t border-garden-light py-4 bg-white">
             <nav className="flex flex-col space-y-4">
-              {/* Mobile Search */}
               <form onSubmit={handleSearch} className="flex mb-4">
                 <Input
                   type="text"
