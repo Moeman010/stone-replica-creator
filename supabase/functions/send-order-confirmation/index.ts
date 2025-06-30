@@ -19,7 +19,7 @@ interface OrderConfirmationRequest {
     price: number;
   }>;
   totalAmount: number;
-  shippingAddress: any;
+  customerPhone?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -28,7 +28,10 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { email, orderId, customerName, items, totalAmount, shippingAddress }: OrderConfirmationRequest = await req.json();
+    const { email, orderId, customerName, items, totalAmount, customerPhone }: OrderConfirmationRequest = await req.json();
+
+    console.log('Sending order confirmation email to:', email);
+    console.log('Order data:', { orderId, customerName, totalAmount, customerPhone });
 
     const itemsHtml = items.map(item => `
       <tr>
@@ -71,19 +74,18 @@ const handler = async (req: Request): Promise<Response> => {
                 </tr>
               </tfoot>
             </table>
+            
+            ${customerPhone ? `
+            <div style="margin-top: 20px;">
+              <p><strong>Telefoonnummer:</strong> ${customerPhone}</p>
+            </div>
+            ` : ''}
           </div>
           
-          ${shippingAddress ? `
-          <div style="background-color: #f9f9f9; padding: 20px; margin: 20px 0; border-radius: 5px;">
-            <h3 style="color: #2c5530; margin-top: 0;">Verzendadres</h3>
-            <p>${shippingAddress.firstName} ${shippingAddress.lastName}<br>
-            ${shippingAddress.address}<br>
-            ${shippingAddress.postalCode} ${shippingAddress.city}<br>
-            Tel: ${shippingAddress.phone}</p>
+          <div style="background-color: #e6f3ff; padding: 20px; margin: 20px 0; border-radius: 5px;">
+            <h3 style="color: #2c5530; margin-top: 0;">Wat gebeurt er nu?</h3>
+            <p>We zullen contact met u opnemen om de verdere details van uw grafsteen te bespreken en een afspraak te maken voor de plaatsing. Uw betaling is succesvol verwerkt via Stripe.</p>
           </div>
-          ` : ''}
-          
-          <p>We zullen contact met u opnemen om de verdere details van uw grafsteen te bespreken en een afspraak te maken voor de plaatsing.</p>
           
           <p>Heeft u vragen over uw bestelling? Neem dan contact met ons op via:</p>
           <ul>
